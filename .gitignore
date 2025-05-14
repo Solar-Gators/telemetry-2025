@@ -1,0 +1,14 @@
+# build outputs
+Debug/
+Binaries/
+
+# IDE workspace settings
+.settings/
+.project
+.cproject
+.mxproject
+*.launch
+
+# OS generated files
+.DS_Store
+Thumbs.db
