@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+void CPP_UserSetup();
+
 // These are the FreeRTOS task functions CubeMX calls
 void StartTXData(void* argument);
 void StartGPSReadBuffer(void* argument);

@@ -60,4 +60,4 @@ private:
 	static constexpr uint8_t DATA_REG = 0xFF;
 };
 
-extern MaxM10S maxm10s_inst;
+extern MaxM10S maxm10s;

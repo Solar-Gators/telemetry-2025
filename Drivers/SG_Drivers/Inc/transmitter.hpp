@@ -4,6 +4,8 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#define NUM_CAN_DEVICES
+
 class Transmitter {
 public:
 	Transmitter() = default;
@@ -13,7 +15,7 @@ public:
 	virtual void init(UART_HandleTypeDef *huart) = 0;
 	virtual void send() = 0;
 protected:
-	uint8_t frame_data;
+	uint8_t* frame_data;
 private:
 	static Transmitter* instance;
 };
@@ -36,3 +38,6 @@ private:
 
 extern Transmitter* transmitter;
 extern SemaphoreHandle_t transmitter_ptr_mutex;
+
+extern Notecard notecard;
+extern RFD900X rfd900x;

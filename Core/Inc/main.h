@@ -46,19 +46,23 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern I2C_HandleTypeDef hi2c2;
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void CPP_UserSetup(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define OK_LED_Pin GPIO_PIN_7
 #define OK_LED_GPIO_Port GPIOA
+#define ERROR_LED_Pin GPIO_PIN_5
+#define ERROR_LED_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 

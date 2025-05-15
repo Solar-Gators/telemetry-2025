@@ -9,6 +9,9 @@ Binaries/
 .mxproject
 *.launch
 
+# secret keys
+Core/Inc/secrets.h
+
 # OS generated files
 .DS_Store
 Thumbs.db
