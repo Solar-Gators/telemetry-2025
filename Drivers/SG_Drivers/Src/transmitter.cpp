@@ -22,7 +22,7 @@ void Notecard::init(UART_HandleTypeDef *huart) {
 
 void Notecard::send() {
 	uint8_t packet[] = "{\"req\":\"note.add\",\"body\":{\"param1\":200,\"param2\":400}}\n";
-	HAL_UART_Transmit(&huart2, packet, sizeof(packet)/sizeof(packet[0]), HAL_MAX_DELAY);
+	HAL_UART_Transmit(huart_, packet, sizeof(packet)/sizeof(packet[0]), HAL_MAX_DELAY);
 
 	/*
 	static char packet[2048];
