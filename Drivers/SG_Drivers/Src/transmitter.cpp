@@ -21,6 +21,10 @@ void Notecard::init(UART_HandleTypeDef *huart) {
 }
 
 void Notecard::send() {
+	uint8_t packet[] = "{\"req\":\"note.add\",\"body\":{\"param1\":200,\"param2\":400}}\n";
+	HAL_UART_Transmit(&huart2, packet, sizeof(packet)/sizeof(packet[0]), HAL_MAX_DELAY);
+
+	/*
 	static char packet[2048];
 	uint16_t bytes_written = snprintf(packet, sizeof(packet), TELEMETRY_DATA_JSON_FORMAT,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -34,6 +38,7 @@ void Notecard::send() {
 
 	char sync[] = "{\"req\":\"hub.sync\"}\n";
 	HAL_UART_Transmit(huart_, (uint8_t*)sync, sizeof(sync), HAL_MAX_DELAY);
+	*/
 }
 
 void RFD900X::init(UART_HandleTypeDef *huart) {
