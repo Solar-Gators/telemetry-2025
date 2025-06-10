@@ -3,11 +3,11 @@ Debug/
 Binaries/
 
 # IDE workspace settings
-.settings/
-.project
-.cproject
-.mxproject
-*.launch
+#.settings/
+#.project
+#.cproject
+#.mxproject
+#*.launch
 
 # secret keys
 Core/Inc/secrets.h
