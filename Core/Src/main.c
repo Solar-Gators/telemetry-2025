@@ -53,20 +53,27 @@ UART_HandleTypeDef huart2;
 osThreadId_t TXDataHandle;
 const osThreadAttr_t TXData_attributes = {
   .name = "TXData",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for GPSReadBuffer */
 osThreadId_t GPSReadBufferHandle;
 const osThreadAttr_t GPSReadBuffer_attributes = {
   .name = "GPSReadBuffer",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for GPSParseNMEA */
 osThreadId_t GPSParseNMEAHandle;
 const osThreadAttr_t GPSParseNMEA_attributes = {
   .name = "GPSParseNMEA",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for CANParseFrames */
+osThreadId_t CANParseFramesHandle;
+const osThreadAttr_t CANParseFrames_attributes = {
+  .name = "CANParseFrames",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -84,6 +91,7 @@ static void MX_CAN1_Init(void);
 void StartTXData(void *argument);
 void StartGPSReadBuffer(void *argument);
 void StartGPSParseNMEA(void *argument);
+void StartCANParseFrames(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -127,7 +135,15 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
+
   CPP_UserSetup();
+
+  HAL_CAN_Start(&hcan1);
+
+  if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
+	  Error_Handler();
+  }
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -158,6 +174,9 @@ int main(void)
 
   /* creation of GPSParseNMEA */
   GPSParseNMEAHandle = osThreadNew(StartGPSParseNMEA, NULL, &GPSParseNMEA_attributes);
+
+  /* creation of CANParseFrames */
+  CANParseFramesHandle = osThreadNew(StartCANParseFrames, NULL, &CANParseFrames_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -243,10 +262,10 @@ static void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 16;
+  hcan1.Init.Prescaler = 2;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_1TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
   hcan1.Init.TimeSeg2 = CAN_BS2_1TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = DISABLE;
@@ -259,7 +278,22 @@ static void MX_CAN1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
+  CAN_FilterTypeDef sFilterConfig;
 
+  sFilterConfig.FilterBank = 0;
+  sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+  sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+  sFilterConfig.FilterIdHigh = 0x0000;
+  sFilterConfig.FilterIdLow = 0x0000;
+  sFilterConfig.FilterMaskIdHigh = 0x0000;
+  sFilterConfig.FilterMaskIdLow = 0x0000;
+  sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+  sFilterConfig.FilterActivation = ENABLE;
+  sFilterConfig.SlaveStartFilterBank = 14;
+
+  if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+  	  Error_Handler();
+    };
   /* USER CODE END CAN1_Init 2 */
 
 }
@@ -405,6 +439,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ERROR_LED_GPIO_Port, ERROR_LED_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : OK_LED_Pin */
   GPIO_InitStruct.Pin = OK_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -419,6 +456,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ERROR_LED_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : STATUS_LED_Pin */
+  GPIO_InitStruct.Pin = STATUS_LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(STATUS_LED_GPIO_Port, &GPIO_InitStruct);
+
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
@@ -427,6 +471,28 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6)
+  {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

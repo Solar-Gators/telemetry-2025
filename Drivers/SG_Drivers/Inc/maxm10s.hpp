@@ -8,6 +8,8 @@ Ublox MAX M10S Driver
 
 #include <cstring>
 #include <cstdio>
+#include <stdlib.h>
+#include <string>
 
 #ifdef USING_FREERTOS
 #include "FreeRTOS.h"
@@ -22,19 +24,19 @@ public:
 	struct GNSSFixData {
 	    double latitude_deg;
 	    double longitude_deg;
-	    float speed_knots;
+	    float ground_speed_knots;
 	    float course_deg;
 	    uint8_t fix_valid;
 	    uint8_t fix_mode;
-	    uint8_t satellites_used;
+	    uint8_t num_satellites;
+	    uint8_t quality;
 	    uint16_t date;
-	    uint32_t time;
+	    std::string time;
 	};
 
-	MaxM10S() = default;
-	void init(I2C_HandleTypeDef* hi2c);
-
-	GNSSFixData getFixData();
+	MaxM10S(I2C_HandleTypeDef* hi2c);
+	void init();;
+	const GNSSFixData getFixDataCopy();
 	void readOutputBuffer();
 	void parseNMEA();
 
@@ -42,14 +44,17 @@ private:
 	uint16_t getDataLength();
 	void parseGNRMC(char* sentence);
 	void parseGNGGA(char* sentence);
-	bool checksumValid(uint8_t* data, uint8_t length);
+	double nmeaToDecimal(const char* nmeaCoord, const char direction);
+	bool NMEAchecksumValid(const char* sentence);
 
 	GNSSFixData fix_data;
 
-	uint8_t gps_buffer[GPS_BUFFER_SIZE];
 	#ifdef USING_FREERTOS
-	SemaphoreHandle_t buffer_mutex;
+	SemaphoreHandle_t buffer_mutex = nullptr;
+    SemaphoreHandle_t fix_data_mutex = nullptr;
 	#endif
+
+    volatile uint8_t gps_buffer[GPS_BUFFER_SIZE];
 	volatile uint16_t gps_head = 0;
 	volatile uint16_t gps_tail = 0;
 
@@ -60,4 +65,4 @@ private:
 	static constexpr uint8_t DATA_REG = 0xFF;
 };
 
-extern MaxM10S maxm10s;
+extern MaxM10S maxm10s; // Global instance of MaxM10S

@@ -63,6 +63,8 @@ void CPP_UserSetup(void);
 #define OK_LED_GPIO_Port GPIOA
 #define ERROR_LED_Pin GPIO_PIN_5
 #define ERROR_LED_GPIO_Port GPIOC
+#define STATUS_LED_Pin GPIO_PIN_0
+#define STATUS_LED_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
