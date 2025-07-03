@@ -5,24 +5,48 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#define MAX_NUM_FRAMES 10
+#define MAX_NUM_FRAMES 15
 
 typedef struct {
-    uint8_t can_id;
+    uint32_t can_id;
     uint8_t data[8];
     uint8_t len;
 } CanFrame;
 
 typedef struct {
-	uint32_t sup_bat_v;
-	uint32_t main_bat_v;
-	uint32_t main_bat_c;
-	uint16_t low_cell_v;
-	uint16_t high_cell_v;
-	uint16_t low_cell_t;
-	uint16_t high_cell_t;
-	uint8_t cell_idx_low_v;
-	uint8_t cell_idx_high_t;
+	uint32_t sup_bat_v = 0;
+	uint32_t main_bat_v = 0;
+	uint32_t main_bat_c = 0;
+	uint16_t low_cell_v = 0;
+	uint16_t high_cell_v = 0;
+	uint16_t low_cell_t = 0;
+	uint16_t high_cell_t= 0;
+	uint8_t cell_idx_low_v = 0;
+	uint8_t cell_idx_high_t = 0;
+
+	// (uint16_t)(value * 100);  // 1 unit = 10 mV = 0.01 V
+	// float decoded_voltage = transmitted_voltage * 0.01f;
+
+	// decoded_value = transmitted_value * 0.01f;
+	uint32_t mppt1_input_v = 0;
+	uint32_t mppt1_input_c = 0;
+	uint32_t mppt1_output_v= 0;
+	uint32_t mppt1_output_c = 0;
+
+	uint32_t mppt2_input_v = 0;
+	uint32_t mppt2_input_c = 0;
+	uint32_t mppt2_output_v= 0;
+	uint32_t mppt2_output_c = 0;
+
+	uint32_t mppt3_input_v = 0;
+	uint32_t mppt3_input_c = 0;
+	uint32_t mppt3_output_v = 0;
+	uint32_t mppt3_output_c = 0;
+
+	uint16_t motor_ctrl_v = 0; // voltage = voltage_raw * 0.5f
+	uint16_t motor_ctrl_c = 0; // current = current_raw * 1.0f
+	uint16_t motor_rpm = 0; // rpm = rpm_raw * 1.0f
+
 } TelemData;
 
 class Transmitter {
@@ -40,7 +64,6 @@ public:
 	void loadGPSData(const MaxM10S::GNSSFixData &data) {
 		fix_data = data;
 	}
-	//void setFixDataSource(const MaxM10S::GNSSFixData& data) { fix_data = &data; }
 	virtual void send() = 0;
 
 protected:

@@ -11,8 +11,6 @@ extern "C" void CPP_UserSetup(void) {
 }
 
 extern "C" void StartTXData(void* argument) {
-	osDelay(6000);
-
 	while(1) {
 		osMutexAcquire(transmitter_ptr_mutex, osWaitForever);
 		if (transmitter == nullptr) {

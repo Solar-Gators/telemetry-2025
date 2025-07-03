@@ -36,7 +36,9 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern I2C_HandleTypeDef hi2c2;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -46,9 +48,12 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-extern UART_HandleTypeDef huart1;
-extern UART_HandleTypeDef huart2;
-extern I2C_HandleTypeDef hi2c2;
+#define MPPT1_CAN_BASE_ID 0x600
+#define MPPT2_CAN_BASE_ID 0x610
+#define MPPT3_CAN_BASE_ID 0x620
+#define MITSUBA_CAN_ID_FRAME0 0x08850225
+#define MITSUBA_CAN_ID_FRAME1 0x08950225
+#define MITSUBA_CAN_ID_FRAME2 0x08A50225
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

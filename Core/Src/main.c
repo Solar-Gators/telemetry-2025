@@ -53,7 +53,7 @@ UART_HandleTypeDef huart2;
 osThreadId_t TXDataHandle;
 const osThreadAttr_t TXData_attributes = {
   .name = "TXData",
-  .stack_size = 256 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for GPSReadBuffer */
@@ -136,6 +136,7 @@ int main(void)
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
 
+  osDelay(6000); // Give Notecard time to boot up
   CPP_UserSetup();
 
   HAL_CAN_Start(&hcan1);

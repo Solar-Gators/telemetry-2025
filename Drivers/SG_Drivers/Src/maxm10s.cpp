@@ -31,7 +31,7 @@ void MaxM10S::readOutputBuffer() {
 
 	if (bytes_available > 0) {
 		if (bytes_available > 256) {
-			bytes_available = 256;
+			bytes_available = 255+1;
 		}
 
 		HAL_I2C_Mem_Read(i2c_handle, (I2C_ADDRESS << 1), DATA_REG, I2C_MEMADD_SIZE_8BIT, rx_buff, bytes_available, HAL_MAX_DELAY);
