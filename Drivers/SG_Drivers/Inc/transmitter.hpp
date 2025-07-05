@@ -14,9 +14,9 @@ typedef struct {
 } CanFrame;
 
 typedef struct {
-	uint32_t sup_bat_v = 0;
+	uint16_t sup_bat_v = 0;
 	uint32_t main_bat_v = 0;
-	uint32_t main_bat_c = 0;
+	float main_bat_c = 0;
 	uint16_t low_cell_v = 0;
 	uint16_t high_cell_v = 0;
 	uint16_t low_cell_t = 0;
@@ -28,20 +28,20 @@ typedef struct {
 	// float decoded_voltage = transmitted_voltage * 0.01f;
 
 	// decoded_value = transmitted_value * 0.01f;
-	uint32_t mppt1_input_v = 0;
-	uint32_t mppt1_input_c = 0;
-	uint32_t mppt1_output_v= 0;
-	uint32_t mppt1_output_c = 0;
+	float mppt1_input_v = 0;
+	float mppt1_input_c = 0;
+	float mppt1_output_v= 0;
+	float mppt1_output_c = 0;
 
-	uint32_t mppt2_input_v = 0;
-	uint32_t mppt2_input_c = 0;
-	uint32_t mppt2_output_v= 0;
-	uint32_t mppt2_output_c = 0;
+	float mppt2_input_v = 0;
+	float mppt2_input_c = 0;
+	float mppt2_output_v= 0;
+	float mppt2_output_c = 0;
 
-	uint32_t mppt3_input_v = 0;
-	uint32_t mppt3_input_c = 0;
-	uint32_t mppt3_output_v = 0;
-	uint32_t mppt3_output_c = 0;
+	float mppt3_input_v = 0;
+	float mppt3_input_c = 0;
+	float mppt3_output_v = 0;
+	float mppt3_output_c = 0;
 
 	uint16_t motor_ctrl_v = 0; // voltage = voltage_raw * 0.5f
 	uint16_t motor_ctrl_c = 0; // current = current_raw * 1.0f
@@ -53,8 +53,8 @@ class Transmitter {
 public:
 	Transmitter(UART_HandleTypeDef *huart);
 	virtual ~Transmitter() {
-		delete[] can_data;
-		delete telem_data;
+		//delete[] can_data;
+		//delete telem_data;
 	}
 
 	static QueueHandle_t getCanRxQueue();
@@ -68,9 +68,10 @@ public:
 
 protected:
 	UART_HandleTypeDef *huart_;
-	CanFrame* can_data = new CanFrame[10];
-	TelemData* telem_data = new TelemData;
+	//CanFrame* can_data;
+	//TelemData* telem_data;
 	MaxM10S::GNSSFixData fix_data;
+	SemaphoreHandle_t telem_data_mutex = nullptr;
 
 	uint8_t num_frames = 0;
 };

@@ -16,7 +16,7 @@ extern "C" void StartTXData(void* argument) {
 		if (transmitter == nullptr) {
 			Error_Handler();
 		}
-		transmitter->loadGPSData(maxm10s.getFixDataCopy());
+		//transmitter->loadGPSData(maxm10s.getFixDataCopy());
 		transmitter->send();
 
 		osMutexRelease(transmitter_ptr_mutex);
@@ -26,7 +26,7 @@ extern "C" void StartTXData(void* argument) {
 
 extern "C" void StartGPSReadBuffer(void* argument) {
 	while(1) {
-		maxm10s.readOutputBuffer();
+		//maxm10s.readOutputBuffer();
 
 		HAL_GPIO_TogglePin(OK_LED_GPIO_Port, OK_LED_Pin);
 		osDelay(500);
@@ -34,9 +34,10 @@ extern "C" void StartGPSReadBuffer(void* argument) {
 }
 
 extern "C" void StartGPSParseNMEA(void* argument) {
+
 	while(1) {
-		maxm10s.parseNMEA();
-		osDelay(200);
+		//maxm10s.parseNMEA();
+		//osDelay(200);
 	}
 }
 
